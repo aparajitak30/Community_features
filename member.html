@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+ </head>
+  <body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Member Dashboard</a>
+            <button class="btn btn-danger" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+ 
+    <div class="container mt-4">
+        <h2>Upload Portfolio</h2>
+        <form id="portfolio-form" class="mb-4">
+            <input type="text" id="name" class="form-control mb-2" placeholder="Your Name" required>
+            <input type="text" id="education" class="form-control mb-2" placeholder="Your Education" required>
+            <textarea id="achievements" class="form-control mb-2" placeholder="Your Achievements" required></textarea>
+            <button type="submit" class="btn btn-primary">Save Portfolio</button>
+        </form>
+
+        <h2>Upload Files</h2>
+        <form id="file-upload-form" enctype="multipart/form-data" class="mb-4">
+            <input type="hidden" id="memberId" value="1">
+            <input type="file" id="fileInput" class="form-control mb-2" required>
+            <button type="submit" class="btn btn-success">Upload File</button>
+            <div id="upload-status" class="mt-2"></div>
+        </form>
+    </div>
+
+    <script>
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+
+        document.getElementById("file-upload-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const fileInput = document.getElementById("fileInput").files[0];
+            const memberId = document.getElementById("memberId").value;
+
+            if (!fileInput || !memberId) {
+            alert("Please select a file!");
+            return;
+        }
+
+            const formData = new FormData();
+            formData.append("file", fileInput);  
+            formData.append("memberId", memberId);
+
+
+            document.getElementById("upload-status").innerText = "Uploading...";
+
+            const response = await fetch("/uploads", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.json();
+            document.getElementById("upload-status").innerText = result.success ? "File uploaded successfully!" : "Upload failed";
+        });
+   
+    </script>
+    
+    <form id="file-upload-form" enctype="multipart/form-data" class="mb-4">
+        <input type="hidden" id="memberId" value="1"> <!-- Replace with actual logged-in member ID -->
+        <input type="file" id="fileInput" class="form-control mb-2" required>
+        <button type="submit" class="btn btn-success">Upload File</button>
+        <div id="upload-status" class="mt-2"></div>
+    </form>
+    
+</body>
+</html>

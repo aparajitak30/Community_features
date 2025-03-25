@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Admin Panel</a>
+            <button class="btn btn-danger" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+    
+    <div class="container mt-4">
+        <h2>All Members</h2>
+        <ul id="member-list" class="list-group"></ul>
+
+        <h2 class="mt-4">Uploaded Files</h2>
+        <ul id="file-list" class="list-group"></ul>
+    </div>
+
+    <script>
+        async function fetchMembers() {
+            const response = await fetch("http://localhost:3000/members");
+            const members = await response.json();
+            const memberList = document.getElementById("member-list");
+            
+            memberList.innerHTML = "";
+            members.forEach(member => {
+                const li = document.createElement("li");
+                li.className = "list-group-item";
+                li.textContent = member.name;
+                li.style.cursor = "pointer";
+                li.onclick = () => fetchFiles(member.id);
+                memberList.appendChild(li);
+            });
+        }
+
+        async function fetchFiles(memberId) {
+            const response = await fetch(`http://localhost:3000/uploads/${memberId}`);
+            const files = await response.json();
+            const fileList = document.getElementById("file-list");
+            
+            fileList.innerHTML = "";
+            files.forEach(file => {
+                const li = document.createElement("li");
+                li.className = "list-group-item";
+                li.innerHTML = `<a href="http://localhost:3000/uploads/${file.filename}" target="_blank">${file.filename}</a>`;
+                fileList.appendChild(li);
+            });
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+
+        fetchMembers(); // Load members on page load
+    </script>
+</body>
+</html>
